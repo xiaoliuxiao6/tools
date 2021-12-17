@@ -2,8 +2,6 @@ module github.com/xiaoliuxiao6/tools
 
 go 1.17
 
-replace github.com/xiaoliuxiao6/tools => /root/md/src/go_code/github.com/tools
-
 require (
 	github.com/sirupsen/logrus v1.8.1
 	go.mongodb.org/mongo-driver v1.8.1

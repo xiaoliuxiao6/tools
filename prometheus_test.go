@@ -1,8 +1,9 @@
 package tools_test
 
 import (
-	"openseaStore/tools"
 	"testing"
+
+	"github.com/xiaoliuxiao6/tools"
 )
 
 // 使用方法演示
