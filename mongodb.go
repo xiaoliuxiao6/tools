@@ -39,6 +39,7 @@ func (s *Session) InitMongoDB() error {
 	return nil
 }
 
+// 插入一条数据
 func (s *Session) InsertOne(dbName, collectionName string, doc interface{}) {
 	coll := s.client.Database(dbName).Collection(collectionName)
 
@@ -50,6 +51,7 @@ func (s *Session) InsertOne(dbName, collectionName string, doc interface{}) {
 	log.Printf("插入文档的 ID：%v\n", result.InsertedID)
 }
 
+// 插入多条数据
 func (s *Session) InsertMany(dbName, collectionName string, doc []interface{}) {
 	coll := s.client.Database(dbName).Collection(collectionName)
 
@@ -60,4 +62,11 @@ func (s *Session) InsertMany(dbName, collectionName string, doc []interface{}) {
 
 	count := len(result.InsertedIDs)
 	log.Printf("插入文档数量：%v", count)
+}
+
+// 查找数据
+func (s *Session) FindOne(dbName, collectionName string, doc []interface{}) {
+	coll := s.client.Database(dbName).Collection(collectionName)
+	result := coll.FindOne(context.TODO(), doc)
+	log.Printf("插入文档数量：%v", result)
 }
