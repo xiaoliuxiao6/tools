@@ -62,6 +62,33 @@ func TestUsaged(t *testing.T) {
 	mongoClient.InsertMany(dbName, collectionName, docs)
 }
 
+// 插入单条数据
+func TestInsertOne(t *testing.T) {
+
+	dbName := "insertDB"
+	collectionName := "haikus"
+
+	// 建立连接
+	mongoClient := tools.New("mongodb://127.0.0.1")
+	err := mongoClient.InitMongoDB()
+	if err != nil {
+		log.Panicln(err)
+	}
+
+	// 插入结构体 - 单条数据
+	bloger := Blog{
+		Name: "Tom",
+		Age:  18,
+	}
+	mongoClient.InsertOne(dbName, collectionName, bloger)
+	result := mongoClient.InsertOne(dbName, collectionName, bloger)
+	// log.Printf("插入文档的 ID：%v\n", result.InsertedID)
+	// fmt.Println(len(result.InsertedID))
+	if result == nil {
+		fmt.Println("插入数量为空")
+	}
+}
+
 // 插入多条数据
 func TestInsertMany(t *testing.T) {
 
@@ -89,32 +116,6 @@ func TestInsertMany(t *testing.T) {
 	blogers = append(blogers, bloger2)
 	// fmt.Println(blogers)
 	mongoClient.InsertMany(dbName, collectionName, blogers)
-}
-
-func TestInsertOne(t *testing.T) {
-
-	dbName := "insertDB"
-	collectionName := "haikus"
-
-	// 建立连接
-	mongoClient := tools.New("mongodb://127.0.0.1")
-	err := mongoClient.InitMongoDB()
-	if err != nil {
-		log.Panicln(err)
-	}
-
-	// 插入结构体 - 单条数据
-	bloger := Blog{
-		Name: "Tom",
-		Age:  18,
-	}
-	mongoClient.InsertOne(dbName, collectionName, bloger)
-	result := mongoClient.InsertOne(dbName, collectionName, bloger)
-	// log.Printf("插入文档的 ID：%v\n", result.InsertedID)
-	// fmt.Println(len(result.InsertedID))
-	if result == nil {
-		fmt.Println("插入数量为空")
-	}
 }
 
 // 创建索引
@@ -157,4 +158,34 @@ func TestAddIndex(t *testing.T) {
 		bson.D{{"myFirstField", "aaa"}, {"mySecondField", "aaa"}},
 	}
 	mongoClient.InsertMany("mydb", "mycollection333", docs)
+}
+
+// 测试事务
+func TestTransaction(t *testing.T) {
+
+	// 建立连接
+	dbName := "insertDB"
+	collectionName := "haikus"
+	mongoClient := tools.New("mongodb://127.0.0.1")
+	err := mongoClient.InitMongoDB()
+	if err != nil {
+		log.Panicln(err)
+	}
+
+	type Stu struct {
+		Name string `bson:"_id"`
+		Age  int
+	}
+
+	// 插入结构体 - 单条数据
+	bloger := Stu{
+		Name: "Tom",
+		Age:  20,
+	}
+	result := mongoClient.InsertOne(dbName, collectionName, bloger)
+	if result == nil {
+		fmt.Println("插入数量为空")
+	} else {
+		fmt.Println(result.InsertedID)
+	}
 }

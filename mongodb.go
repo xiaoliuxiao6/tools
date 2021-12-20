@@ -11,7 +11,7 @@ import (
 )
 
 type Session struct {
-	client     *mongo.Client
+	Client     *mongo.Client
 	collection *mongo.Collection
 	uri        string
 	Options    options.IndexOptions
@@ -37,7 +37,7 @@ func (s *Session) InitMongoDB() error {
 	if err != nil {
 		return err
 	}
-	s.client = client
+	s.Client = client
 	return nil
 }
 
@@ -49,7 +49,7 @@ func (s *Session) AddIndex(dbName string, collectionName string, indexKeys inter
 	// aaa := options.Index()
 	// aaa.SetUnique(true)
 
-	coll := s.client.Database(dbName).Collection(collectionName)
+	coll := s.Client.Database(dbName).Collection(collectionName)
 	indexName, err := coll.Indexes().CreateOne(context.TODO(), mongo.IndexModel{
 		Keys:    indexKeys,
 		Options: &s.Options,
@@ -63,10 +63,11 @@ func (s *Session) AddIndex(dbName string, collectionName string, indexKeys inter
 }
 
 // 插入一条数据
-func (s *Session) InsertOne(dbName, collectionName string, doc interface{}) *mongo.InsertOneResult {
-	coll := s.client.Database(dbName).Collection(collectionName)
+func (s *Session) InsertOne(dbName, collectionName string, doc interface{}, ctx ...context.Context) *mongo.InsertOneResult {
+	coll := s.Client.Database(dbName).Collection(collectionName)
 
-	result, err := coll.InsertOne(context.TODO(), doc)
+	// result, err := coll.InsertOne(context.TODO(), doc)
+	result, err := coll.InsertOne(ctx[0], doc)
 	if err != nil {
 		if mongo.IsDuplicateKeyError(err) {
 			log.Println("主键冲突")
@@ -79,7 +80,7 @@ func (s *Session) InsertOne(dbName, collectionName string, doc interface{}) *mon
 
 // 插入多条数据
 func (s *Session) InsertMany(dbName, collectionName string, doc []interface{}) *mongo.InsertManyResult {
-	coll := s.client.Database(dbName).Collection(collectionName)
+	coll := s.Client.Database(dbName).Collection(collectionName)
 
 	result, err := coll.InsertMany(context.TODO(), doc)
 	if err != nil {
