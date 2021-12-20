@@ -10,6 +10,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+// 官方事务文档：https://docs.mongodb.com/manual/core/transactions/
+
 type Session struct {
 	Client     *mongo.Client
 	collection *mongo.Collection
