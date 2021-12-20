@@ -15,6 +15,7 @@ type Blog struct {
 	Age  int
 }
 
+// 基本使用示例
 func TestUsaged(t *testing.T) {
 
 	dbName := "insertDB"
@@ -53,10 +54,52 @@ func TestUsaged(t *testing.T) {
 	doc := bson.D{{"title", "Record of a Shriveled Datum"}, {"text", "No bytes, no problem. Just insert a document, in MongoDB"}}
 	mongoClient.InsertOne(dbName, collectionName, doc)
 
-	// 插入多个额文档
+	// 插入多个文档
 	docs := []interface{}{
 		bson.D{{"title", "Record of a Shriveled Datum"}, {"text", "No bytes, no problem. Just insert a document, in MongoDB"}},
 		bson.D{{"title", "Showcasing a Blossoming Binary"}, {"text", "Binary data, safely stored with GridFS. Bucket the data"}},
 	}
 	mongoClient.InsertMany(dbName, collectionName, docs)
+}
+
+// 创建索引
+func TestAddIndex(t *testing.T) {
+	// 建立连接
+	mongoClient := tools.New("mongodb://127.0.0.1")
+	err := mongoClient.InitMongoDB()
+	if err != nil {
+		log.Panicln(err)
+	}
+
+	// 设置是否为唯一索引
+	mongoClient.Options.SetUnique(true)
+
+	// // 单字段索引（方式1）
+	// aaa := map[string]interface{}{
+	// 	"myfieldname_type1": 1,
+	// }
+	// mongoClient.AddIndex("mydb", "mycollection111", aaa) // to descending set it to -1
+
+	// // 单字段索引（方式2）
+	// mongoClient.AddIndex("mydb", "mycollection111", bson.M{"myfieldname_type2": 1}) // to descending set it to -1
+
+	// // 符合索引
+	// mongoClient.AddIndex("mydb", "mycollection222", bson.D{{"myFirstField", 1}, {"mySecondField", -1}}) // to descending set it to -1
+
+	// // 文本索引
+	// mongoClient.AddIndex("mydb", "mycollection333", bson.D{{"myFirstTextField", "text"}, {"mySecondTextField", "text"}})
+
+	// 插入多个文档
+	// 符合索引
+	mongoClient.AddIndex("mydb", "mycollection333", bson.D{{"myFirstField", 1}, {"mySecondField", -1}}) // to descending set it to -1
+
+	// mongoClient.set
+	docs := []interface{}{
+		// 	bson.D{{"myFirstField", "aaa"}, {"mySecondField", "aaa"}, {"_id", "111"}},
+		// 	bson.D{{"myFirstField", "bbb"}, {"mySecondField", "bbb"}, {"_id", "111"}},
+
+		bson.D{{"myFirstField", "aaa"}, {"mySecondField", "aaa"}},
+		bson.D{{"myFirstField", "aaa"}, {"mySecondField", "aaa"}},
+	}
+	mongoClient.InsertMany("mydb", "mycollection333", docs)
 }

@@ -2,6 +2,7 @@ package tools
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
 
@@ -13,6 +14,7 @@ type Session struct {
 	client     *mongo.Client
 	collection *mongo.Collection
 	uri        string
+	Options    options.IndexOptions
 }
 
 func New(uri string) *Session {
@@ -39,6 +41,27 @@ func (s *Session) InitMongoDB() error {
 	return nil
 }
 
+// 创建索引
+// 参考：https://stackoverflow.com/questions/56759074/how-do-i-create-a-text-index-in-mongodb-with-golang-and-the-mongo-go-driver
+func (s *Session) AddIndex(dbName string, collectionName string, indexKeys interface{}) error {
+
+	// 手动实现，可以用
+	// aaa := options.Index()
+	// aaa.SetUnique(true)
+
+	coll := s.client.Database(dbName).Collection(collectionName)
+	indexName, err := coll.Indexes().CreateOne(context.TODO(), mongo.IndexModel{
+		Keys:    indexKeys,
+		Options: &s.Options,
+		// Options: options.Index().SetUnique(true),	// 原始格式
+	})
+	if err != nil {
+		return err
+	}
+	fmt.Println(indexName)
+	return nil
+}
+
 // 插入一条数据
 func (s *Session) InsertOne(dbName, collectionName string, doc interface{}) {
 	coll := s.client.Database(dbName).Collection(collectionName)
@@ -60,11 +83,17 @@ func (s *Session) InsertMany(dbName, collectionName string, doc []interface{}) {
 
 	result, err := coll.InsertMany(context.TODO(), doc)
 	if err != nil {
-		log.Panicln(err)
+		if !mongo.IsDuplicateKeyError(err) {
+			log.Panicln(err)
+			// log.Println("主键冲突")
+			// return
+		}
+
 	}
 
+	totalCount := len(doc)
 	count := len(result.InsertedIDs)
-	log.Printf("插入文档数量：%v", count)
+	log.Printf("传入文档数量：%v, 插入文档数量：%v", totalCount, count)
 }
 
 // // 查找数据
