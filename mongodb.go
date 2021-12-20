@@ -63,37 +63,35 @@ func (s *Session) AddIndex(dbName string, collectionName string, indexKeys inter
 }
 
 // 插入一条数据
-func (s *Session) InsertOne(dbName, collectionName string, doc interface{}) {
+func (s *Session) InsertOne(dbName, collectionName string, doc interface{}) *mongo.InsertOneResult {
 	coll := s.client.Database(dbName).Collection(collectionName)
 
 	result, err := coll.InsertOne(context.TODO(), doc)
 	if err != nil {
 		if mongo.IsDuplicateKeyError(err) {
 			log.Println("主键冲突")
-			return
+			return nil
 		}
 		log.Panicln(err)
 	}
-	log.Printf("插入文档的 ID：%v\n", result.InsertedID)
+	return result
 }
 
 // 插入多条数据
-func (s *Session) InsertMany(dbName, collectionName string, doc []interface{}) {
+func (s *Session) InsertMany(dbName, collectionName string, doc []interface{}) *mongo.InsertManyResult {
 	coll := s.client.Database(dbName).Collection(collectionName)
 
 	result, err := coll.InsertMany(context.TODO(), doc)
 	if err != nil {
-		if !mongo.IsDuplicateKeyError(err) {
+		if !mongo.IsDuplicateKeyError(err) { // 如果不是主键冲突的错误，引发恐慌
 			log.Panicln(err)
-			// log.Println("主键冲突")
-			// return
 		}
-
 	}
 
-	totalCount := len(doc)
-	count := len(result.InsertedIDs)
-	log.Printf("传入文档数量：%v, 插入文档数量：%v", totalCount, count)
+	// totalCount := len(doc)
+	// count := len(result.InsertedIDs)
+	// log.Printf("传入文档数量：%v, 插入文档数量：%v", totalCount, count)
+	return result
 }
 
 // // 查找数据
