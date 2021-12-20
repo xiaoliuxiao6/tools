@@ -61,6 +61,7 @@ func (s *Session) InsertOne(dbName, collectionName string, doc interface{}) {
 	if err != nil {
 		if IsDup(err) {
 			log.Println("主键重复")
+            return
 		}
 		log.Panicln(err)
 	}
