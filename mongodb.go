@@ -39,12 +39,28 @@ func (s *Session) InitMongoDB() error {
 	return nil
 }
 
+// 判断是否为主键重复
+func IsDup(err error) bool {
+	var e mongo.WriteException
+	if errors.As(err, &e) {
+		for _, we := range e.WriteErrors {
+			if we.Code == 11000 {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 // 插入一条数据
 func (s *Session) InsertOne(dbName, collectionName string, doc interface{}) {
 	coll := s.client.Database(dbName).Collection(collectionName)
 
 	result, err := coll.InsertOne(context.TODO(), doc)
 	if err != nil {
+		if IsDup(err) {
+			log.Println("主键重复")
+		}
 		log.Panicln(err)
 	}
 
