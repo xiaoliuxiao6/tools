@@ -81,9 +81,10 @@ func (s *Session) InsertMany(dbName, collectionName string, doc []interface{}) {
 	log.Printf("插入文档数量：%v", count)
 }
 
-// 查找数据
-func (s *Session) FindOne(dbName, collectionName string, doc []interface{}) {
-	coll := s.client.Database(dbName).Collection(collectionName)
-	result := coll.FindOne(context.TODO(), doc)
-	log.Printf("插入文档数量：%v", result)
-}
+// // 查找数据
+// func (s *Session) FindOne(dbName, collectionName string, doc []interface{}) {
+// 	coll := s.client.Database(dbName).Collection(collectionName)
+// 	result := coll.FindOne(context.TODO(), doc)
+// 	log.Printf("插入文档数量：%v", result)
+// }
+
