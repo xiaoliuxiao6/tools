@@ -13,10 +13,12 @@ import (
 // 官方事务文档：https://docs.mongodb.com/manual/core/transactions/
 
 type Session struct {
-	Client     *mongo.Client
-	collection *mongo.Collection
-	uri        string
-	Options    options.IndexOptions
+	Client         *mongo.Client
+	collection     *mongo.Collection
+	uri            string
+	Options        options.IndexOptions
+	FindOneOptions options.FindOneOptions
+	FindOptions    options.FindOptions
 }
 
 func New(uri string) *Session {
@@ -26,6 +28,7 @@ func New(uri string) *Session {
 	return session
 }
 
+// 初始化数据库
 func (s *Session) InitMongoDB() error {
 	var ClientOpts = options.Client().
 		// 基本设置
@@ -34,7 +37,7 @@ func (s *Session) InitMongoDB() error {
 		SetMaxPoolSize(10).                      // 连接池连接数 - 最大
 		SetMinPoolSize(1)                        // 连接池连接数 - 最小
 
-	// 创建客户端
+	// 创建客户端FindOneOptions
 	client, err := mongo.Connect(context.TODO(), ClientOpts)
 	if err != nil {
 		return err
@@ -95,6 +98,37 @@ func (s *Session) InsertMany(dbName, collectionName string, doc []interface{}) *
 	// count := len(result.InsertedIDs)
 	// log.Printf("传入文档数量：%v, 插入文档数量：%v", totalCount, count)
 	return result
+}
+
+// 查找一条数据
+func (s *Session) FindOne(dbName, collectionName string, filter interface{}, ret interface{}, opts ...*options.FindOneOptions) (notFind bool, err error) {
+	// func (s *Session) FindOne(dbName, collectionName string, filter interface{}, ret interface{}) (notFind bool, err error) {
+	coll := s.Client.Database(dbName).Collection(collectionName)
+	// options.FindOneOptions.SetSort()
+	// opts := options.FindOne().SetSort(bson.D{{"number", -1}})
+	err = coll.FindOne(context.TODO(), filter, opts...).Decode(ret)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			notFind = true
+			err = nil
+		}
+	}
+	return
+}
+
+// 查找多条数据
+func (s *Session) Find(dbName, collectionName string, filter interface{}, ret interface{}, opts ...*options.FindOptions) (notFind bool, err error) {
+	coll := s.Client.Database(dbName).Collection(collectionName)
+	cursor, err := coll.Find(context.TODO(), filter)
+	cursor.Decode(ret)
+	// cursor, err = coll.Find(context.TODO(), filter).Decode(ret)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			notFind = true
+			err = nil
+		}
+	}
+	return
 }
 
 // // 查找数据
