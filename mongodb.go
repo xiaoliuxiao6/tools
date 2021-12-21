@@ -71,8 +71,8 @@ func (s *Session) AddIndex(dbName string, collectionName string, indexKeys inter
 func (s *Session) InsertOne(dbName, collectionName string, doc interface{}, ctx ...context.Context) *mongo.InsertOneResult {
 	coll := s.Client.Database(dbName).Collection(collectionName)
 
-	// result, err := coll.InsertOne(context.TODO(), doc)
-	result, err := coll.InsertOne(ctx[0], doc)
+	result, err := coll.InsertOne(context.TODO(), doc)
+	// result, err := coll.InsertOne(ctx[0], doc)
 	if err != nil {
 		if mongo.IsDuplicateKeyError(err) {
 			log.Println("主键冲突")
