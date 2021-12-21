@@ -218,6 +218,37 @@ func TestFindOne(t *testing.T) {
 	tools.StructPrint(ret)
 }
 
+// 查找多条数据
+func TestFind(t *testing.T) {
+	// 建立连接
+	mongoClient := tools.New("mongodb://127.0.0.1")
+	err := mongoClient.InitMongoDB()
+	if err != nil {
+		log.Panicln(err)
+	}
+
+	// 查询方式1（手动写 Map 类型过滤器）
+	filter := map[string]interface{}{
+		"blockNumber": "0xcf8500",
+	}
+
+	// 排序（可选）
+	sort := map[string]interface{}{
+		"blockNumber": -1,
+	}
+	opts := mongoClient.FindOptions.SetSort(sort)
+
+	// 执行查询
+	results, err := mongoClient.Find("eth", "BlockByNumberResultTransactions", filter, opts)
+	if err != nil {
+		fmt.Println("Find 运行结果错误")
+	}
+
+	for _, result := range results {
+		fmt.Println(result["hash"])
+	}
+}
+
 // // 测试事务（只有 4.0 以上版本且副本集群可用）
 // func TestTransaction(t *testing.T) {
 

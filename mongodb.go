@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -117,23 +118,18 @@ func (s *Session) FindOne(dbName, collectionName string, filter interface{}, ret
 }
 
 // 查找多条数据
-func (s *Session) Find(dbName, collectionName string, filter interface{}, ret interface{}, opts ...*options.FindOptions) (notFind bool, err error) {
+func (s *Session) Find(dbName, collectionName string, filter interface{}, ret interface{}, opts ...*options.FindOptions) (results []bson.M, err error) {
 	coll := s.Client.Database(dbName).Collection(collectionName)
-	cursor, err := coll.Find(context.TODO(), filter)
-	cursor.Decode(ret)
-	// cursor, err = coll.Find(context.TODO(), filter).Decode(ret)
+	cursor, err := coll.Find(context.TODO(), filter, opts...)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			notFind = true
 			err = nil
 		}
 	}
-	return
-}
 
-// // 查找数据
-// func (s *Session) FindOne(dbName, collectionName string, doc []interface{}) {
-// 	coll := s.client.Database(dbName).Collection(collectionName)
-// 	result := coll.FindOne(context.TODO(), doc)
-// 	log.Printf("插入文档数量：%v", result)
-// }
+	if err = cursor.All(context.TODO(), &results); err != nil {
+		log.Fatal(err)
+	}
+
+	return results, err
+}
