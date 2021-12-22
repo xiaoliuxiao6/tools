@@ -2,7 +2,6 @@ package tools
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"time"
 
@@ -49,7 +48,7 @@ func (s *Session) InitMongoDB() error {
 
 // 创建索引
 // 参考：https://stackoverflow.com/questions/56759074/how-do-i-create-a-text-index-in-mongodb-with-golang-and-the-mongo-go-driver
-func (s *Session) AddIndex(dbName string, collectionName string, indexKeys interface{}) error {
+func (s *Session) AddIndex(dbName string, collectionName string, indexKeys interface{}) {
 
 	// 手动实现，可以用
 	// aaa := options.Index()
@@ -62,15 +61,15 @@ func (s *Session) AddIndex(dbName string, collectionName string, indexKeys inter
 		// Options: options.Index().SetUnique(true),	// 原始格式
 	})
 	if err != nil {
-		return err
+		log.Panicf("创建索引失败，DBName：%v, collectionName：%v, indexKeys：%v", dbName, collectionName, indexKeys)
+		return
 	}
-	fmt.Println(indexName)
-	return nil
+	log.Printf("创建索引成功：%v", indexName)
 }
 
 // 创建单字段索引（优化使用）
 // 参考：https://stackoverflow.com/questions/56759074/how-do-i-create-a-text-index-in-mongodb-with-golang-and-the-mongo-go-driver
-func (s *Session) AddIndexSingle(dbName string, collectionName string, Key string, Desc int, SetUnique bool) error {
+func (s *Session) AddIndexSingle(dbName string, collectionName string, Key string, Desc int, SetUnique bool) {
 
 	indexKeys := map[string]interface{}{
 		Key: Desc,
@@ -87,10 +86,10 @@ func (s *Session) AddIndexSingle(dbName string, collectionName string, Key strin
 		// Options: options.Index().SetUnique(true),	// 原始格式
 	})
 	if err != nil {
-		return err
+		log.Panicf("创建索引失败，DBName：%v, collectionName：%v, Key：%v, Desc：%v, SetUnique：%v", dbName, collectionName, Key, Desc, SetUnique)
+		return
 	}
-	fmt.Println(indexName)
-	return nil
+	log.Printf("创建索引成功：%v", indexName)
 }
 
 // 插入一条数据
