@@ -61,8 +61,8 @@ func (s *Session) AddIndex(dbName string, collectionName string, indexKeys inter
 		// Options: options.Index().SetUnique(true),	// 原始格式
 	})
 	if err != nil {
-		log.Panicf("创建索引失败，DBName：%v, collectionName：%v, indexKeys：%v", dbName, collectionName, indexKeys)
-		return
+		log.Printf("创建索引失败，DBName：%v, collectionName：%v, indexKeys：%v", dbName, collectionName, indexKeys)
+		log.Panic(err)
 	}
 	log.Printf("创建索引成功：%v", indexName)
 }
@@ -86,8 +86,8 @@ func (s *Session) AddIndexSingle(dbName string, collectionName string, Key strin
 		// Options: options.Index().SetUnique(true),	// 原始格式
 	})
 	if err != nil {
-		log.Panicf("创建索引失败，DBName：%v, collectionName：%v, Key：%v, Desc：%v, SetUnique：%v", dbName, collectionName, Key, Desc, SetUnique)
-		return
+		log.Printf("创建索引失败，DBName：%v, collectionName：%v, Key：%v, Desc：%v, SetUnique：%v", dbName, collectionName, Key, Desc, SetUnique)
+		log.Panic(err)
 	}
 	log.Printf("创建索引成功：%v", indexName)
 }
