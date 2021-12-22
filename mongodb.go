@@ -68,6 +68,27 @@ func (s *Session) AddIndex(dbName string, collectionName string, indexKeys inter
 	return nil
 }
 
+// 创建单字段索引（优化使用）
+// 参考：https://stackoverflow.com/questions/56759074/how-do-i-create-a-text-index-in-mongodb-with-golang-and-the-mongo-go-driver
+func (s *Session) AddIndexSingle(dbName string, collectionName string, Key string, SetUnique bool) error {
+
+	indexKeys := map[string]interface{}{
+		Key: SetUnique,
+	}
+
+	coll := s.Client.Database(dbName).Collection(collectionName)
+	indexName, err := coll.Indexes().CreateOne(context.TODO(), mongo.IndexModel{
+		Keys:    indexKeys,
+		Options: &s.Options,
+		// Options: options.Index().SetUnique(true),	// 原始格式
+	})
+	if err != nil {
+		return err
+	}
+	fmt.Println(indexName)
+	return nil
+}
+
 // 插入一条数据
 func (s *Session) InsertOne(dbName, collectionName string, doc interface{}, ctx ...context.Context) *mongo.InsertOneResult {
 	coll := s.Client.Database(dbName).Collection(collectionName)
