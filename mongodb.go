@@ -2,6 +2,7 @@ package tools
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
 
@@ -46,7 +47,7 @@ func (s *Session) InitMongoDB() error {
 	return nil
 }
 
-// 创建索引
+// 创建索引（可以弃用了）
 // 参考：https://stackoverflow.com/questions/56759074/how-do-i-create-a-text-index-in-mongodb-with-golang-and-the-mongo-go-driver
 func (s *Session) AddIndex(dbName string, collectionName string, indexKeys interface{}) {
 
@@ -71,24 +72,34 @@ func (s *Session) AddIndex(dbName string, collectionName string, indexKeys inter
 // 参考：https://stackoverflow.com/questions/56759074/how-do-i-create-a-text-index-in-mongodb-with-golang-and-the-mongo-go-driver
 func (s *Session) AddIndexSingle(dbName string, collectionName string, Key string, Desc int, SetUnique bool) {
 
+	// 设置索引 Key
 	indexKeys := map[string]interface{}{
 		Key: Desc,
 	}
 
+	// 是否设置为唯一索引
 	if SetUnique {
 		options.Index().SetUnique(SetUnique)
 	}
 
+	// 设置索引名称
+	s.Options.SetName(Key + "_" + fmt.Sprintln(Desc))
+
+	// 开始设置索引
 	coll := s.Client.Database(dbName).Collection(collectionName)
 	indexName, err := coll.Indexes().CreateOne(context.TODO(), mongo.IndexModel{
 		Keys:    indexKeys,
 		Options: &s.Options,
 		// Options: options.Index().SetUnique(true),	// 原始格式
 	})
+
+	// 如果有问题，直接报错
 	if err != nil {
 		log.Printf("创建索引失败，DBName：%v, collectionName：%v, Key：%v, Desc：%v, SetUnique：%v", dbName, collectionName, Key, Desc, SetUnique)
 		log.Panic(err)
 	}
+
+	// 否则的话输出创建公共的信息
 	log.Printf("创建索引成功：%v", indexName)
 }
 

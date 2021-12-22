@@ -130,14 +130,14 @@ func TestAddIndex(t *testing.T) {
 	// 设置是否为唯一索引
 	mongoClient.Options.SetUnique(true)
 
-	// // 单字段索引（方式1）
-	// aaa := map[string]interface{}{
-	// 	"myfieldname_type1": 1,
-	// }
-	// mongoClient.AddIndex("mydb", "mycollection111", aaa) // to descending set it to -1
+	// 单字段索引（方式1）
+	aaa := map[string]interface{}{
+		"myfieldname_type1": 1,
+	}
+	mongoClient.AddIndex("mydb", "mycollection111", aaa) // to descending set it to -1
 
-	// // 单字段索引（方式2）
-	// mongoClient.AddIndex("mydb", "mycollection111", bson.M{"myfieldname_type2": 1}) // to descending set it to -1
+	// 单字段索引（方式2）
+	mongoClient.AddIndex("mydb", "mycollection111", bson.M{"myfieldname_type2": 1}) // to descending set it to -1
 
 	// // 符合索引
 	// mongoClient.AddIndex("mydb", "mycollection222", bson.D{{"myFirstField", 1}, {"mySecondField", -1}}) // to descending set it to -1
@@ -145,19 +145,33 @@ func TestAddIndex(t *testing.T) {
 	// // 文本索引
 	// mongoClient.AddIndex("mydb", "mycollection333", bson.D{{"myFirstTextField", "text"}, {"mySecondTextField", "text"}})
 
-	// 插入多个文档
-	// 符合索引
-	mongoClient.AddIndex("mydb", "mycollection333", bson.D{{"myFirstField", 1}, {"mySecondField", -1}}) // to descending set it to -1
+	// // 符合索引
+	// mongoClient.AddIndex("mydb", "mycollection333", bson.D{{"myFirstField", 1}, {"mySecondField", -1}}) // to descending set it to -1
 
-	// mongoClient.set
-	docs := []interface{}{
-		// 	bson.D{{"myFirstField", "aaa"}, {"mySecondField", "aaa"}, {"_id", "111"}},
-		// 	bson.D{{"myFirstField", "bbb"}, {"mySecondField", "bbb"}, {"_id", "111"}},
+	// // mongoClient.set
+	// docs := []interface{}{
+	// 	// 	bson.D{{"myFirstField", "aaa"}, {"mySecondField", "aaa"}, {"_id", "111"}},
+	// 	// 	bson.D{{"myFirstField", "bbb"}, {"mySecondField", "bbb"}, {"_id", "111"}},
 
-		bson.D{{"myFirstField", "aaa"}, {"mySecondField", "aaa"}},
-		bson.D{{"myFirstField", "aaa"}, {"mySecondField", "aaa"}},
+	// 	bson.D{{"myFirstField", "aaa"}, {"mySecondField", "aaa"}},
+	// 	bson.D{{"myFirstField", "aaa"}, {"mySecondField", "aaa"}},
+	// }
+	// mongoClient.InsertMany("mydb", "mycollection333", docs)
+}
+
+func TestAddIndexSingle(t *testing.T) {
+	// 建立连接
+	mongoClient := tools.New("mongodb://127.0.0.1")
+	err := mongoClient.InitMongoDB()
+	if err != nil {
+		log.Panicln(err)
 	}
-	mongoClient.InsertMany("mydb", "mycollection333", docs)
+
+	// 设置是否为唯一索引
+	// mongoClient.Options.SetUnique(true)
+
+	mongoClient.AddIndexSingle("mydb", "TransactionByHash", "hash", -1, true)
+	mongoClient.AddIndexSingle("mydb", "TransactionByHash", "transactionIndex", -1, false)
 }
 
 // 查找单条数据
