@@ -118,7 +118,7 @@ func (s *Session) FindOne(dbName, collectionName string, filter interface{}, ret
 }
 
 // 查找多条数据
-func (s *Session) Find(dbName, collectionName string, filter interface{}, ret interface{}, opts ...*options.FindOptions) (results []bson.M, err error) {
+func (s *Session) Find(dbName, collectionName string, filter interface{}, opts ...*options.FindOptions) (results []bson.M, err error) {
 	coll := s.Client.Database(dbName).Collection(collectionName)
 	cursor, err := coll.Find(context.TODO(), filter, opts...)
 	if err != nil {
