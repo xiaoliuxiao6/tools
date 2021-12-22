@@ -70,10 +70,14 @@ func (s *Session) AddIndex(dbName string, collectionName string, indexKeys inter
 
 // 创建单字段索引（优化使用）
 // 参考：https://stackoverflow.com/questions/56759074/how-do-i-create-a-text-index-in-mongodb-with-golang-and-the-mongo-go-driver
-func (s *Session) AddIndexSingle(dbName string, collectionName string, Key string, SetUnique bool) error {
+func (s *Session) AddIndexSingle(dbName string, collectionName string, Key string, Desc int, SetUnique bool) error {
 
 	indexKeys := map[string]interface{}{
-		Key: SetUnique,
+		Key: Desc,
+	}
+
+	if SetUnique {
+		options.Index().SetUnique(SetUnique)
 	}
 
 	coll := s.Client.Database(dbName).Collection(collectionName)
