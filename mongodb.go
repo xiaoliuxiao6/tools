@@ -43,6 +43,11 @@ func (s *Session) InitMongoDB() error {
 	if err != nil {
 		return err
 	}
+
+	if err := client.Ping(context.TODO(), nil); err != nil {
+		log.Panicf("数据库连接失败", err)
+	}
+
 	s.Client = client
 	return nil
 }
