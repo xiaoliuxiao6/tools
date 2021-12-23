@@ -121,7 +121,7 @@ func (s *Session) InsertOne(dbName, collectionName string, doc interface{}, ctx 
 	// result, err := coll.InsertOne(ctx[0], doc)
 	if err != nil {
 		if mongo.IsDuplicateKeyError(err) {
-			log.Println("主键冲突")
+			log.Warnf("主键冲突：dbName：%v, collectionName：%v， Doc：%v", dbName, collectionName, doc)
 			return nil
 		}
 		log.Panicln(err)
