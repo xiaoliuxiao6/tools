@@ -2,11 +2,10 @@ package tools
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"log"
 	"time"
 
+	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -84,7 +83,7 @@ func (s *Session) AddIndexSingle(dbName string, collectionName string, Key strin
 	}
 
 	// 设置索引名称
-	// s.Options.SetName(Key + "_" + fmt.Sprintln(Desc))
+	s.Options.SetName(Key + "_" + fmt.Sprintln(Desc))
 
 	// 开始设置索引
 	coll := s.Client.Database(dbName).Collection(collectionName)
@@ -97,29 +96,20 @@ func (s *Session) AddIndexSingle(dbName string, collectionName string, Key strin
 	// mongo.ErrInvalidIndexValue
 	// 如果有问题，直接报错
 	if err != nil {
-		log.Printf("创建索引失败，DBName：%v, collectionName：%v, Key：%v, Desc：%v, SetUnique：%v", dbName, collectionName, Key, Desc, SetUnique)
-		// log.Panic(err)
-
-		fmt.Printf("111 %T\n", err.(mongo.CommandError))
-		fmt.Println("222", err.(mongo.CommandError))
 
 		if e, ok := err.(mongo.ServerError); ok {
-			fmt.Println("aaa", e)
-			fmt.Println("bbb", ok)
-			fmt.Println("ccc", e.Error())
+			fmt.Println(e.Error())
+			if e.HasErrorCode(85) {
+				log.Warnf("索引已经存在%v\n", e)
+				return
+			}
 		}
 
-		// fmt.Println(err["code"])
-		aaa := errors.Unwrap(err)
-		fmt.Println("aaa", aaa)
-		// if errors.Is(err, "IndexOptionsConflict") {
-		// 	fmt.Println(err)
-		// }
-		fmt.Printf("%T\n", err)
-		return
+		log.Errorf("创建索引失败，DBName：%v, collectionName：%v, Key：%v, Desc：%v, SetUnique：%v", dbName, collectionName, Key, Desc, SetUnique)
+		log.Panic(err)
 	}
 
-	// 否则的话输出创建公共的信息
+	// 否则的话输出创建索引的信息
 	log.Printf("创建索引成功：%v", indexName)
 }
 

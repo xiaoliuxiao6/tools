@@ -1,3 +1,3 @@
-# 1.0.21
+# 1.0.22
 # go get github.com/xiaoliuxiao6/tools@v1.0.2
 
