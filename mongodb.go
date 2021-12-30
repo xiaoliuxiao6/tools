@@ -45,7 +45,7 @@ func (s *Session) InitMongoDB() error {
 	}
 
 	if err := client.Ping(context.TODO(), nil); err != nil {
-		log.Panicf("数据库连接失败", err)
+		log.Panicf("数据库连接失败: %v", err)
 	}
 
 	s.Client = client
