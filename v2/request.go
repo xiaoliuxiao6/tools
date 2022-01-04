@@ -19,7 +19,7 @@ func Request(url string, method string, data string, Headers map[string]string, 
 
 	client := &http.Client{}
 
-	client.Timeout = 30 // 设置超时时间
+	client.Timeout = 30 * time.Second // 设置超时时间
 
 	req, err := http.NewRequest(method, url, payload)
 	if err != nil {
