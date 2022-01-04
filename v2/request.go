@@ -18,6 +18,9 @@ func Request(url string, method string, data string, Headers map[string]string, 
 	payload := strings.NewReader(data)
 
 	client := &http.Client{}
+
+	client.Timeout = 30 // 设置超时时间
+
 	req, err := http.NewRequest(method, url, payload)
 	if err != nil {
 		return
