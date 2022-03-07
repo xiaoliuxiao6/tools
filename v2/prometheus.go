@@ -3,11 +3,12 @@ package tools
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // 定义初始全局变量
@@ -87,7 +88,7 @@ func (metricser Metrics) WriteTextfile(filename string) error {
 	if len(filename) == 0 {
 		filename = filepath.Join("/usr/local/node_exporter/textfile_collector/", nameSpace+"-"+subsystem+".prom")
 	}
-	log.Println("Prom 文件路径：", filename)
+	log.Println("Prom 文件路径: ", filename)
 	tmp, err := ioutil.TempFile(filepath.Dir(filename), filepath.Base(filename))
 	if err != nil {
 		return err
