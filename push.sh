@@ -1,5 +1,7 @@
 #!/bin/bash 
 
+export https_proxy=http://127.0.0.1:7890
+
 echo
 echo "-------------------- Tools 仓库"
 ## 执行上传

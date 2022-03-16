@@ -3,7 +3,7 @@ package tools_test
 import (
 	"testing"
 
-	"github.com/xiaoliuxiao6/tools"
+	"github.com/xiaoliuxiao6/tools/v2"
 )
 
 // 使用方法演示
