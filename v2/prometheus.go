@@ -89,7 +89,12 @@ func (metricser Metrics) WriteTextfile(filename string) error {
 		filename = filepath.Join("/usr/local/node_exporter/textfile_collector/", nameSpace+"-"+subsystem+".prom")
 	}
 	log.Println("Prom 文件路径: ", filename)
-	tmp, err := ioutil.TempFile(filepath.Dir(filename), filepath.Base(filename))
+
+	if err := os.Mkdir(filepath.Dir(filename), os.ModeDir); err != nil {
+		log.Panicf("创建 Prometheus Text 临时目录失败")
+	}
+
+	tmp, err := ioutil.TempFile(filepath.Dir(filename), filepath.Base(filename+".tmp"))
 	if err != nil {
 		return err
 	}
